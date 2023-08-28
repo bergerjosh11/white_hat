@@ -1,67 +1,69 @@
-# Import necessary libraries
-import requests
-from bs4 import BeautifulSoup
 import numpy as np
 import tensorflow as tf
-from sklearn.preprocessing import StandardScaler
-
-# Import your AIModel class from AI_model.py
 from AI_model import AIModel
-
-# Load the existing model
-existing_model = tf.keras.models.load_model("trained_model.h5")
-
-# List of URLs to scrape (replace with actual URLs)
-urls_to_scrape = ["https://example.com/page1", "https://example.com/page2"]
+from bs4 import BeautifulSoup
+import requests
+import time
 
 # Instantiate your AIModel
-ai_model = AIModel("path/to/your/model.h5")  # Update the path accordingly
+ai_model = AIModel("AI_model.h5")  # Update the path accordingly
 
-# Web scraping function
-def scrape_website(url):
+# Initialize URL queue and visited set
+url_queue = ["https://www.google.com"]  # Starting URL
+visited_urls = set()
+
+# Initialize lists to store features (X) and labels (y)
+X = []
+y = []
+
+# Maximum number of pages to crawl (adjust as needed)
+max_pages = 10
+
+# Perform web crawl
+while url_queue and len(visited_urls) < max_pages:
+    current_url = url_queue.pop(0)  # Get the next URL from the queue
+
+    # Check if URL has been visited
+    if current_url in visited_urls:
+        continue
+
+    # Visit the URL and extract features
     try:
-        response = requests.get(url)
+        response = requests.get(current_url)
         if response.status_code == 200:
             content = response.content
             soup = BeautifulSoup(content, 'html.parser')
             features = ai_model.extract_features(soup)  # Use AIModel's extract_features method
-            return features
+
+            # Process features and update your dataset
+            if features is not None:
+                X.append(features)  # Add extracted features to the X list
+                y.append(1)  # Add corresponding label (indicating vulnerability) to the y list
+
+                visited_urls.add(current_url)  # Mark URL as visited
+
+                # Extract links from the page and add to the queue
+                links = [link.get("href") for link in soup.find_all("a")]
+                for link in links:
+                    if link and link.startswith("http"):
+                        url_queue.append(link)
+
+                time.sleep(1)  # Add a delay to be polite to the server
         else:
-            return None
+            print("Failed to fetch URL:", current_url, "Status Code:", response.status_code)
     except requests.exceptions.RequestException as e:
-        return None
+        print("Error:", e)
 
-# Main function for updating the model
-def update_model_with_scraped_data():
-    # Collect scraped data and labels
-    scraped_data = []
-    scraped_labels = []
-    for url in urls_to_scrape:
-        features = scrape_website(url)
-        if features is not None:
-            scraped_data.append(features)
-            scraped_labels.append(1)  # Label indicating vulnerability
+# Convert lists to numpy arrays
+X = np.array(X)
+y = np.array(y)
 
-    # Preprocess scraped data
-    preprocessed_data = np.array(scraped_data)  # Convert to numpy array
+# Train a new model using the collected dataset
+new_model = tf.keras.Sequential([
+    # Define your model layers here based on your architecture
+])
+new_model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+new_model.fit(X, y, epochs=10)  # Adjust epochs as needed
 
-    # Load existing data and labels (replace with your own data loading logic)
-    existing_data = ...
-    existing_labels = ...
-
-    # Combine existing data with preprocessed data
-    combined_data = np.concatenate((existing_data, preprocessed_data), axis=0)
-    combined_labels = np.concatenate((existing_labels, scraped_labels), axis=0)
-
-    # Train a new model using the combined dataset
-    new_model = tf.keras.Sequential([
-        # Define your model layers here based on your architecture
-    ])
-    new_model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-    new_model.fit(combined_data, combined_labels, epochs=10)  # Adjust epochs as needed
-
-    # Save the updated model
-    new_model.save("trained_model_updated.h5")
-
-# Update the model using scraped data
-update_model_with_scraped_data()
+# Save the trained model
+new_model.save("trained_model.h5")
