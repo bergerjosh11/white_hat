@@ -4,7 +4,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 
 # Example dataset: Features and labels
-# Replace this with your actual dataset
 X = np.random.rand(100, 3)  # Example features
 y = np.random.choice([0, 1], size=100)  # Example labels
 
