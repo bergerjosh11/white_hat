@@ -1,27 +1,24 @@
-import subprocess
 from AI_model import AIModel
 import requests
 
-def run_security_test(url, ai_model):
-    response = requests.get(url)
-    content = response.content
-
-    # Use the AI model to detect vulnerabilities
-    detected_vulnerabilities = ai_model.detect_vulnerabilities(content)
-
-    return detected_vulnerabilities
-
-if __name__ == "__main__":
-    import sys
-
+def main():
     if len(sys.argv) != 2:
-        print("Usage: python security_test.py <url>")
+        print("Usage: python main.py <url>")
         sys.exit(1)
 
     target_url = sys.argv[1]
 
-    # Initialize the AI model
-    ai_model = AIModel()
+    model_path = "path/to/your/model"  # Path to your AI model
+    ai_model = AIModel(model_path)
 
-    # Run security test using subprocess
-    run_security_test(target_url, ai_model)
+    response = requests.get(target_url)
+    content = response.content
+
+    detected_vulnerabilities = ai_model.detect_vulnerabilities(content)
+
+    print("Detected vulnerabilities:")
+    for vulnerability in detected_vulnerabilities:
+        print(vulnerability)
+
+if __name__ == "__main__":
+    main()
