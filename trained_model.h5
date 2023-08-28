@@ -5,19 +5,17 @@ import numpy as np
 import tensorflow as tf
 from sklearn.preprocessing import StandardScaler
 
+# Import your AIModel class from AI_model.py
+from AI_model import AIModel
+
 # Load the existing model
 existing_model = tf.keras.models.load_model("trained_model.h5")
 
 # List of URLs to scrape (replace with actual URLs)
 urls_to_scrape = ["https://example.com/page1", "https://example.com/page2"]
 
-# Define your AI model class (similar to the AI_model.py structure)
-class AIModel:
-    def __init__(self, model_path):
-        self.model = tf.keras.models.load_model(model_path)
-        self.feature_scaler = StandardScaler()
-
-    # Other methods for vulnerability detection and preprocessing
+# Instantiate your AIModel
+ai_model = AIModel("path/to/your/model.h5")  # Update the path accordingly
 
 # Web scraping function
 def scrape_website(url):
@@ -26,17 +24,12 @@ def scrape_website(url):
         if response.status_code == 200:
             content = response.content
             soup = BeautifulSoup(content, 'html.parser')
-            features = extract_features(soup)
+            features = ai_model.extract_features(soup)  # Use AIModel's extract_features method
             return features
         else:
             return None
     except requests.exceptions.RequestException as e:
         return None
-
-# Feature extraction function
-def extract_features(soup):
-    features = ...  # Implement your feature extraction logic here
-    return features
 
 # Main function for updating the model
 def update_model_with_scraped_data():
