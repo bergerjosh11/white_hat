@@ -6,7 +6,7 @@ import requests
 import time
 from robotexclusionrulesparser import RobotExclusionRulesParser
 
-# Instantiate your AIModel
+# Instantiate AIModel
 ai_model = AIModel("AI_model.h5")  # Update the path accordingly
 
 # Initialize URL queue and visited set
