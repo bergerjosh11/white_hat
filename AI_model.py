@@ -1,3 +1,4 @@
+# AI_model.py
 import tensorflow as tf
 from sklearn.preprocessing import StandardScaler
 
@@ -23,8 +24,7 @@ class AIModel:
         return processed_features
 
     def extract_features(self, website_data):
-        # Extract relevant features from website_data
-        # Example: Number of open ports, presence of security headers, etc.
+        # Implement your feature extraction logic here
         features = ...  # Extracted features
         return features
 
@@ -32,21 +32,3 @@ class AIModel:
         # Normalize or scale features
         normalized_features = self.feature_scaler.transform(features)
         return normalized_features
-
-
-# main.py
-from AI_model import AIModel
-
-def main():
-    model_path = "path/to/your/model"
-    website_data = ...  # Load or gather website data for assessment
-
-    ai_model = AIModel(model_path)
-    vulnerabilities = ai_model.detect_vulnerabilities(website_data)
-
-    print("Detected vulnerabilities:")
-    for vulnerability in vulnerabilities:
-        print(vulnerability)
-
-if __name__ == "__main__":
-    main()
