@@ -29,6 +29,5 @@ class AIModel:
         return features
 
     def preprocess_features(self, features):
-        # Normalize or scale features
         normalized_features = self.feature_scaler.transform(features)
         return normalized_features
