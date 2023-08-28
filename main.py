@@ -3,6 +3,7 @@
 from AI_model import AIModel
 import requests
 import sys
+import os
 
 def main():
     if len(sys.argv) != 2:
@@ -11,7 +12,12 @@ def main():
 
     target_url = sys.argv[1]
 
-    model_path = "path/to/your/trained_model.h5"  # Path to your trained AI model
+    # Get the path of the directory where main.py is located
+    script_directory = os.path.dirname(os.path.realpath(__file__))
+
+    # Construct the path to the trained model file in the same directory
+    model_path = os.path.join(script_directory, "trained_model.h5")
+
     ai_model = AIModel(model_path)
 
     try:
