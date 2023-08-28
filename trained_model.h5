@@ -4,6 +4,7 @@ from AI_model import AIModel
 from bs4 import BeautifulSoup
 import requests
 import time
+from robotexclusionrulesparser import RobotExclusionRulesParser
 
 # Instantiate your AIModel
 ai_model = AIModel("AI_model.h5")  # Update the path accordingly
@@ -19,9 +20,34 @@ y = []
 # Maximum number of pages to crawl (adjust as needed)
 max_pages = 10
 
+# Initialize RobotExclusionRulesParser
+robot_parser = RobotExclusionRulesParser()
+
+# Define function to fetch robots.txt content
+def fetch_robots_txt(url):
+    try:
+        robots_txt_url = f"{url.rstrip('/')}/robots.txt"
+        response = requests.get(robots_txt_url)
+        if response.status_code == 200:
+            return response.text
+        return None
+    except requests.exceptions.RequestException as e:
+        return None
+
+# Define function to check if URL is allowed by robots.txt
+def is_allowed_by_robots_txt(url):
+    robots_txt = fetch_robots_txt(url)
+    if robots_txt:
+        robot_parser.parse(robots_txt)
+        return robot_parser.can_fetch("*", url)
+    return True
+
 # Perform web crawl
 while url_queue and len(visited_urls) < max_pages:
     current_url = url_queue.pop(0)  # Get the next URL from the queue
+
+    if not is_allowed_by_robots_txt(current_url):
+        continue
 
     # Check if URL has been visited
     if current_url in visited_urls:
